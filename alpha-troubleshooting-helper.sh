@@ -128,11 +128,10 @@ will be packaged into a tar archive at the end.
 while true ; do
 	echo "Please select the number matching your issue:"
 	select fault in "battery" "HDDs-SSDs" "networking" "temperature" "Skip-this-step" ; do
-		case $fault in
-			battery ) 
+        case $fault in
+            battery )
                 selected_field="b"
-                echo
-				echo "Gathering battery info"
+                echo -e "\nGathering battery info"
                 echo "### BATTERY INFO ###" >> "${info_file}"
                 echo "# UPOWER #" >> "${info_file}"
                 upower -i "${battery_locator}" >> "${info_file}"
@@ -145,12 +144,11 @@ while true ; do
                 echo "# TLP SYSTEMCTL STATUS #" >> "${info_file}"
                 systemctl status tlp.service >> "${info_file}"
                 echo -e "\n" >> "${info_file}"
-				break
-				;;
-			HDDs-SSDs ) 
+                break
+                ;;
+            HDDs-SSDs ) 
                 selected_field="d"
-                echo
-				echo "Gathering drive info"
+                echo -e "\nGathering drive info"
                 echo "### DRIVE INFO ###" >> "${info_file}"
                 echo "# FSTAB #" >> "${info_file}"
                 cat /etc/fstab >> "${info_file}"
@@ -163,15 +161,14 @@ while true ; do
                 echo "# LSBLK #" >> "${info_file}"
                 lsblk -a -f >> "${info_file}"
                 echo -e "\n" >> "${info_file}"
-				break
-				;;
-			networking ) 
+                break
+                ;;
+            networking ) 
                 selected_field="n"
                 if [[ ! -x /bin/netstat ]] ; then
                     sudo apt install -y net-tools
                 fi
-                echo
-				echo "Gathering wifi / ethernet info"
+                echo -e "\nGathering wifi / ethernet info"
                 echo "### NETWORKING INFO ###" >> "${info_file}"
                 echo "# INTERFACE INFO #" >> "${info_file}"
                 ip addr show >> "${info_file}"
@@ -193,15 +190,14 @@ while true ; do
                     sudo iw dev "${second_iface}" link >> "${info_file}"
                 fi 
                 echo -e "\n" >> "${info_file}"
-				break
-				;;
-			temperature ) 
+                break
+                ;;
+            temperature ) 
                 selected_field="t"
                 if [[ ! -x /usr/bin/sensors ]] ; then
                     sudo apt -y install lm-sensors
                 fi
-                echo
-				echo "Gathering temperature info"
+                echo -e "\nGathering temperature info"
                 echo "### TEMPERATURE INFO ###" >> "${info_file}"
                 # find all CPU hogs, which may be contributing to high temps
                 echo "# CPU HOGS #" >> "${info_file}"
@@ -211,26 +207,23 @@ while true ; do
                 echo "# SENSORS #" >> "${info_file}"
                 sensors >> "${info_file}"
                 echo -e "\n" >> "${info_file}"
-				break
-				;;
-			Skip-this-step )
-				selected_field="s"
-				echo
-				echo -e "Skipping to the end \n"
-				break
-				;;
-			* )
-				echo
-				echo -e "That selection is invalid.  Please choose a number that matches your issue \n"
-				;;
+                break
+                ;;
+            Skip-this-step )
+                selected_field="s"
+                echo -e "\nSkipping to the end \n"
+                break
+                ;;
+            * )
+                echo -e "\nThat selection is invalid.  Please choose a number that matches your issue \n"
+                ;;
 		esac
 	done
 
 # select another field or quit
     # test whether only hardware / system info was gathered
     if [[ "${selected_field}" == "s" ]] ; then
-	echo
-        echo "Writing only the system info and packaging results"
+        echo -e "\nWriting only the system info and packaging results"
         echo -e "Please attach the "${final_tar}" archive in your next response \n"
         tar_test
         sudo chown "${cur_user}":"${cur_user}" "${final_tar}"
@@ -238,30 +231,26 @@ while true ; do
         rm "${info_file}"
         exit 0
     else
-		echo
-	    echo "Would you like to select another issue to troubleshoot, or quit and package results?"
-	    select resp in "Choose-another-field" "Quit" ; do
-		    case $resp in 
-			    Choose-another-field)
-				echo
-				    echo -e "Returning to issue selector. \n"
-				    break
-				    ;;
-			    Quit)
-				echo
-				    echo "OK. Writing info and packaging results"
+        echo -e "\nWould you like to select another issue to troubleshoot, or quit and package results?"
+        select resp in "Choose-another-field" "Quit" ; do
+            case $resp in
+                Choose-another-field)
+                    echo -e "\nReturning to issue selector. \n"
+                    break
+                    ;;
+                Quit)
+                    echo -e "\nOK. Writing info and packaging results"
                     echo -e "Please attach the "${final_tar}" archive in your next response \n"
                     tar_test
                     sudo chown "${cur_user}":"${cur_user}" "${final_tar}"
                     rm /home/"${cur_user}"/dmesg.txt
                     rm "${info_file}"
                     exit 0
-				    ;;
-			    * )
-				echo
-				    echo -e "That selection is invalid.  Please choose to continue or quit \n"
-				    ;;			
-		    esac
+                    ;;
+                * )
+                    echo -e "\nThat selection is invalid.  Please choose to continue or quit \n"
+                    ;;
+            esac
         done
     fi
 done
