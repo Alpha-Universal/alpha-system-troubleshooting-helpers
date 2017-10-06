@@ -22,7 +22,7 @@ fi
 cur_user="$(who | cut -f 1 -d ' ' | uniq)"
 full_date="$(date +%a-%F)"
 info_file="/home/${cur_user}/${cur_user}-${full_date}_troubleshooting.info"
-final_tar="${cur_user}-troubleshooting.tar.gz"
+final_tar="/home/${cur_user}-troubleshooting.tar.gz"
 
 # copy dmesg for later
 dmesg > /home/"${cur_user}"/dmesg.txt
