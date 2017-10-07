@@ -23,6 +23,7 @@ cur_user="$(who | cut -f 1 -d ' ' | uniq)"
 full_date="$(date +%a-%F)"
 info_file="/home/${cur_user}/${cur_user}-${full_date}_troubleshooting.info"
 final_tar="/home/${cur_user}/${cur_user}-${full_date}_troubleshooting.tar.gz"
+bios_file="/home/${cur_user}/${cur_user}-${full_date}_bios.info"
 
 # copy dmesg for later
 dmesg > /home/"${cur_user}"/dmesg.txt
@@ -43,17 +44,17 @@ fi
 # the --exclude option is for the .gz backups in /var/log/lightdm
 tar_test () {
     if [[ "${ldm_status}" == 1 && "${x_status}" == 1 ]] ; then
-        tar cvzf "${final_tar}" "${info_file}" /var/log/syslog /var/log/syslog.1 \
+        tar cvzf "${final_tar}" "${info_file}" "${bios_file}" /var/log/syslog /var/log/syslog.1 \
         /var/log/lightdm/ /var/log/Xorg.0.log /home/"${cur_user}"/dmesg.txt --exclude=*.gz 
     elif [[ "${ldm_status}" == 1 && "${x_status}" == 0 ]] ; then
-        tar cvzf "${final_tar}" "${info_file}" /var/log/syslog /var/log/syslog.1 \
+        tar cvzf "${final_tar}" "${info_file}" "${bios_file}" /var/log/syslog /var/log/syslog.1 \
         /var/log/lightdm/ /home/"${cur_user}"/dmesg.txt --exclude=*.gz 
     elif [[ "${ldm_status}" == 0 && "${x_status}" == 1 ]] ; then
-        tar cvzf "${final_tar}" "${info_file}" /var/log/syslog /var/log/syslog.1 \
+        tar cvzf "${final_tar}" "${info_file}" "${bios_file}" /var/log/syslog /var/log/syslog.1 \
         /var/log/Xorg.0.log /home/"${cur_user}"/dmesg.txt
     else
         # neither lightdm nor Xorg.0.log are present
-        tar cvzf "${final_tar}" "${info_file}" /var/log/syslog /var/log/syslog.1 \
+        tar cvzf "${final_tar}" "${info_file}" "${bios_file}" /var/log/syslog /var/log/syslog.1 \
         /home/"${cur_user}"/dmesg.txt
     fi
 }
@@ -63,6 +64,7 @@ bad_exit () {
 	echo "Script exited unexpectedly. Removing all temporary files"
 	rm /home/"${cur_user}"/dmesg.txt 
 	rm "${info_file}"
+	rm "${bios_file}" 
 	exit 1
 }
 
@@ -85,8 +87,8 @@ if [[ ! -x /usr/bin/lshw ]] ; then
     sudo apt -y install lshw
 fi
 
-# start file with relevant info
-echo "### SYSTEM INFO ###" >> "${info_file}"
+# start main file with default info
+echo "### SYSTEM INFO ###" > "${info_file}"
 echo "# KERNEL #" >> "${info_file}"
 uname -a >> "${info_file}"
 echo -e "\n" >> "${info_file}"
@@ -123,6 +125,10 @@ echo -e "\n" >> "${info_file}"
 echo "### LOADED MODULES ###" >> "${info_file}"
 lsmod | sort >> "${info_file}"
 echo -e "\n" >> "${info_file}"
+
+# gather BIOS info in a separate file
+echo "### BIOS INFO ###" > "${bios_file}"
+sudo dmidecode >> "${bios_file}" 
 
 # print an introductory message
 echo "
