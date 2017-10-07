@@ -112,6 +112,14 @@ echo "# LSUSB #" >> "${info_file}"
 lsusb >> "${info_file}"
 echo -e "\n" >> "${info_file}"
 
+echo "# PARTITIONS #" >> "${info_file}"
+lsblk -a -f >> "${info_file}"
+echo -e "\n" >> "${info_file}"
+
+echo "# MEMORY #" >> "${info_file}"
+free -hwl --si >> "${info_file}"
+echo -e "\n" >> "${info_file}"
+
 echo "### LOADED MODULES ###" >> "${info_file}"
 lsmod | sort >> "${info_file}"
 echo -e "\n" >> "${info_file}"
@@ -156,10 +164,6 @@ while true ; do
 
                 echo "# DF #" >> "${info_file}"
                 df -ha >> "${info_file}"
-                echo -e "\n" >> "${info_file}"
-
-                echo "# LSBLK #" >> "${info_file}"
-                lsblk -a -f >> "${info_file}"
                 echo -e "\n" >> "${info_file}"
                 break
                 ;;
