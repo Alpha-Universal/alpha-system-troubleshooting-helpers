@@ -70,7 +70,7 @@ bad_exit () {
 trap bad_exit SIGINT SIGTERM
 
 # battery vars
-battery_locator="$(upower -e | grep -e "BAT[0,1]")"
+battery_locator="$(upower -e | grep -e "BAT[0|1]")"
 
 # net vars
 # technically lo is the first iface.  These account for the
@@ -236,7 +236,7 @@ while true ; do
     # test whether only hardware / system info was gathered
     if [[ "${selected_field}" == "s" ]] ; then
         echo -e "\nWriting only the system info and packaging results"
-        echo -e "Please attach the "${final_tar}" archive in your next response \n"
+        echo -e "Please attach the ${final_tar} archive in your next response \n"
         tar_test
         sudo chown "${cur_user}":"${cur_user}" "${final_tar}"
         rm /home/"${cur_user}"/dmesg.txt
@@ -252,7 +252,7 @@ while true ; do
                     ;;
                 Quit)
                     echo -e "\nOK. Writing info and packaging results"
-                    echo -e "Please attach the "${final_tar}" archive in your next response \n"
+                    echo -e "Please attach the ${final_tar} archive in your next response \n"
                     tar_test
                     sudo chown "${cur_user}":"${cur_user}" "${final_tar}"
                     rm /home/"${cur_user}"/dmesg.txt
