@@ -60,7 +60,7 @@ tar_test () {
 # create function for trap file cleanup
 bad_exit () {
 	echo "Script exited unexpectedly. Removing all temporary files"
-	rm /home/"${cur_user}"/dmesg.txt 
+	rm "${dmesg_file}"
 	rm "${info_file}"
 	rm "${bios_file}" 
 	exit 1
@@ -239,7 +239,7 @@ while true ; do
         echo -e "Please attach the ${final_tar} archive in your next response \n"
         tar_test
         sudo chown "${cur_user}":"${cur_user}" "${final_tar}"
-        rm /home/"${cur_user}"/dmesg.txt
+        rm "${dmesg_file}"
         rm "${info_file}"
         exit 0
     else
@@ -255,7 +255,7 @@ while true ; do
                     echo -e "Please attach the ${final_tar} archive in your next response \n"
                     tar_test
                     sudo chown "${cur_user}":"${cur_user}" "${final_tar}"
-                    rm /home/"${cur_user}"/dmesg.txt
+                    rm "${dmesg_file}"
                     rm "${info_file}"
                     exit 0
                     ;;
