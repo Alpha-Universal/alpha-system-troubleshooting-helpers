@@ -22,9 +22,9 @@ fi
 cur_user="$(who | cut -f 1 -d ' ' | uniq)"
 full_date="$(date +%a-%F)"
 info_file="/home/${cur_user}/${cur_user}-${full_date}_troubleshooting.info"
-final_tar="/home/${cur_user}/${cur_user}-${full_date}_troubleshooting.tar.gz"
 bios_file="/home/${cur_user}/${cur_user}-${full_date}_bios.info"
 dmesg_file="/home/${cur_user}/${cur_user}-${full_date}_dmesg.txt"
+final_tar="/home/${cur_user}/${cur_user}-${full_date}_troubleshooting.tar.gz"
 
 # set lightdm dir and xorg log as unavailable
 ldm_status=0
@@ -170,9 +170,14 @@ while true ; do
                 cat /etc/fstab >> "${info_file}"
                 echo -e "\n" >> "${info_file}"
 
+                echo "# PARTED #" >> "${info_file}"
+                parted --list --script >> "${info_file}"
+                echo -e "\n" >> "${info_file}"
+
                 echo "# DF #" >> "${info_file}"
                 df -ha >> "${info_file}"
                 echo -e "\n" >> "${info_file}"
+
                 break
                 ;;
             networking ) 
