@@ -82,7 +82,7 @@ second_iface="$(ip addr show | grep state | grep -m 1 3: | awk '{ print $2 }' | 
 
 # install lshw for verbose hardware info
 if [[ ! -x /usr/bin/lshw ]] ; then
-    sudo apt -y install lshw
+    apt -y install lshw
 fi
 
 # start main file with default info
@@ -126,7 +126,7 @@ echo -e "\n" >> "${info_file}"
 
 # gather BIOS info in a separate file
 echo "### BIOS INFO ###" > "${bios_file}"
-sudo dmidecode >> "${bios_file}" 
+dmidecode >> "${bios_file}" 
 
 # copy dmesg for later packaging
 echo "### DMESG ###" > "${dmesg_file}"
@@ -178,7 +178,7 @@ while true ; do
             networking ) 
                 selected_field="n"
                 if [[ ! -x /bin/netstat ]] ; then
-                    sudo apt install -y net-tools
+                    apt install -y net-tools
                 fi
                 echo -e "\nGathering wifi / ethernet info"
                 echo "### NETWORKING INFO ###" >> "${info_file}"
@@ -197,9 +197,9 @@ while true ; do
                 # determine signal strength, based on which interface is wlan0
                 echo "# WIFI SIGNAL STRENGTH #" >> "${info_file}"
                 if [[ -z "${second_iface}" ]] ; then
-                    sudo iw dev "${first_iface}" link >> "${info_file}"
+                    iw dev "${first_iface}" link >> "${info_file}"
                 else
-                    sudo iw dev "${second_iface}" link >> "${info_file}"
+                    iw dev "${second_iface}" link >> "${info_file}"
                 fi 
                 echo -e "\n" >> "${info_file}"
                 break
@@ -207,7 +207,7 @@ while true ; do
             temperature ) 
                 selected_field="t"
                 if [[ ! -x /usr/bin/sensors ]] ; then
-                    sudo apt -y install lm-sensors
+                    apt -y install lm-sensors
                 fi
                 echo -e "\nGathering temperature info"
                 echo "### TEMPERATURE INFO ###" >> "${info_file}"
@@ -238,7 +238,7 @@ while true ; do
         echo -e "\nWriting only the system info and packaging results"
         echo -e "Please attach the ${final_tar} archive in your next response \n"
         tar_test
-        sudo chown "${cur_user}":"${cur_user}" "${final_tar}"
+        chown "${cur_user}":"${cur_user}" "${final_tar}"
         rm "${dmesg_file}"
         rm "${info_file}"
         rm "${bios_file}"
@@ -255,7 +255,7 @@ while true ; do
                     echo -e "\nOK. Writing info and packaging results"
                     echo -e "Please attach the ${final_tar} archive in your next response \n"
                     tar_test
-                    sudo chown "${cur_user}":"${cur_user}" "${final_tar}"
+                    chown "${cur_user}":"${cur_user}" "${final_tar}"
                     rm "${dmesg_file}"
                     rm "${info_file}"
                     rm "${bios_file}"
