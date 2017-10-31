@@ -101,7 +101,7 @@ lscpu >> "${info_file}"
 echo -e "\n" >> "${info_file}"
 
 echo "# LSHW #" >> "${info_file}"
-lshw >> "${info_file}"
+lshw >> "${info_file}" || echo "lshw was not installed" >> "${info_file}"
 echo -e "\n" >> "${info_file}"
 
 echo "# LSPCI #" >> "${info_file}"
@@ -192,7 +192,8 @@ while true ; do
                 echo -e "\n" >> "${info_file}"
 
                 echo "# NETSTAT #" >> "${info_file}"
-                netstat -tulpn >> "${info_file}"
+                netstat -tulpn >> "${info_file}" || \
+                    echo "netstat was not installed" >> "${info_file}"
                 echo -e "\n" >> "${info_file}"
 
                 echo "# IPTABLES #" >> "${info_file}"
@@ -216,13 +217,15 @@ while true ; do
                 fi
                 echo -e "\nGathering temperature info"
                 echo "### TEMPERATURE INFO ###" >> "${info_file}"
+
                 # find all CPU hogs, which may be contributing to high temps
                 echo "# CPU HOGS #" >> "${info_file}"
                 ps -eo pcpu,pid,user,args | sort -k1 -r | head >> "${info_file}"
                 echo -e "\n" >> "${info_file}"
 
                 echo "# SENSORS #" >> "${info_file}"
-                sensors >> "${info_file}"
+                sensors >> "${info_file}" || \
+                    echo "sensors was not installed" >> "${info_file}"
                 echo -e "\n" >> "${info_file}"
                 break
                 ;;
