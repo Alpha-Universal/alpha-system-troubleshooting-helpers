@@ -241,6 +241,7 @@ while true ; do
         sudo chown "${cur_user}":"${cur_user}" "${final_tar}"
         rm "${dmesg_file}"
         rm "${info_file}"
+        rm "${bios_file}"
         exit 0
     else
         echo -e "\nWould you like to select another issue to troubleshoot, or quit and package results?"
@@ -257,6 +258,7 @@ while true ; do
                     sudo chown "${cur_user}":"${cur_user}" "${final_tar}"
                     rm "${dmesg_file}"
                     rm "${info_file}"
+                    rm "${bios_file}"
                     exit 0
                     ;;
                 * )
