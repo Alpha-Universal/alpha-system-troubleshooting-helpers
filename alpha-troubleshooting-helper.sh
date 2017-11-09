@@ -1,9 +1,10 @@
 #!/bin/bash -
 
+#
 #   Name    :   alpha-troubleshooting-helper.sh
 #   Author  :   Richard Buchanan II for Alpha Universal, LLC
 #   Brief   :   A script to gather useful info to help with
-#		troubleshooting all Alpha devices.
+#               troubleshooting all Alpha devices.
 #
 
 set -o errexit      # exits if non-true exit status is returned
@@ -59,11 +60,11 @@ tar_test () {
 
 # create function for trap file cleanup
 bad_exit () {
-	echo "Script exited unexpectedly. Removing all temporary files"
-	rm "${dmesg_file}"
-	rm "${info_file}"
-	rm "${bios_file}" 
-	exit 1
+    echo "Script exited unexpectedly. Removing all temporary files"
+    rm "${dmesg_file}"
+    rm "${info_file}"
+    rm "${bios_file}" 
+    exit 1
 }
 
 # have trap remove littered files if the script exits unexpectedly
@@ -91,31 +92,31 @@ fi
 blocked_gui=0
 
 while [[ "${blocked_gui}" == 0 ]] ; do
-	echo -e "\nAre you running this troubleshooter in a TTY?"
-	select yn in "Yes" "No" ; do
+    echo -e "\nAre you running this troubleshooter in a TTY?"
+    select yn in "Yes" "No" ; do
         case $yn in
             Yes )
-				blocked_gui="y"
-				# scan /dev for current drives to find USB later.  Couldn't get
-				# arrays to play nice with newlines just yet, so sed removes all
-				# newlines from ls
-				cur_drives="$(ls /dev/sd[a-z] | sed 's/\n/ /g')"
+                blocked_gui="y"
+                # scan /dev for current drives to find USB later.  Couldn't get
+                # arrays to play nice with newlines just yet, so sed removes all
+                # newlines from ls
+                cur_drives="$(ls /dev/sd[a-z] | sed 's/\n/ /g')"
 
-				echo -e "\nOK, please plug in your USB now."
-				# use sleep to fake interactivity for now
-				sleep 5
-				break
-				;;
-			No )
-				blocked_gui="n"				
-				echo -e "\nOK, moving on to info collection."
-				break
-				;;
+                echo -e "\nOK, please plug in your USB now."
+                # use sleep to fake interactivity for now
+                sleep 5
+                break
+                ;;
+            No )
+                blocked_gui="n"
+                echo -e "\nOK, moving on to info collection."
+                break
+                ;;
             * )
                 echo -e "\nThat selection is invalid.  Please select yes or no. \n"
                 ;;
-		esac
-	done
+        esac
+    done
 done
 
 # start main file with default info
@@ -178,8 +179,8 @@ main_break=0
 
 # main loop
 while [[ "${main_break}" == 0 ]] ; do
-	echo "Please select the number matching your issue:"
-	select fault in "battery" "HDDs-SSDs" "networking" "temperature" "Skip-this-step" ; do
+    echo "Please select the number matching your issue:"
+    select fault in "battery" "HDDs-SSDs" "networking" "temperature" "Skip-this-step" ; do
         case $fault in
             battery )
                 selected_field="b"
@@ -273,8 +274,8 @@ while [[ "${main_break}" == 0 ]] ; do
             * )
                 echo -e "\nThat selection is invalid.  Please choose a number that matches your issue \n"
                 ;;
-		esac
-	done
+        esac
+    done
 
 # select another field or quit
     # test whether only hardware / system info was gathered
@@ -296,7 +297,7 @@ while [[ "${main_break}" == 0 ]] ; do
                     break
                     ;;
                 Quit)
-			        main_break=1
+                    main_break=1
                     tar_test
                     echo -e "\nWriting info and packaging results"
                     echo "Please attach the ${final_tar} archive in your next response"
@@ -315,53 +316,53 @@ done
 
 # bring the USB into the picture, if running in a TTY
 if [[ "${blocked_gui}" == "y" ]] ; then
-	# scan drives in /dev again and compare to what we found the first time
-	new_drives="$(ls /dev/sd[a-z] | sed 's/\n/ /g')"
+    # scan drives in /dev again and compare to what we found the first time
+    new_drives="$(ls /dev/sd[a-z] | sed 's/\n/ /g')"
 
-	# loop until the USB is added
-	while [[ "${cur_drives}" == "${new_drives}" ]] ; do
-		echo "Your USB drive wasn't found.  Please insert it now."
-		sleep 5
-		# reload our /dev search results
-		new_drives="$(ls /dev/sd[a-z] | sed 's/\n/ /g')"
-	done
-	
-	# define the last sequential ls entry as the USB drive.
-	usb_drive="$(echo ${new_drives} | awk '{ print $NF }')"
-	
-	# Concatenate 1 to the USB drive entry.  The drive is currently used as if
-	# it had one partition spanning the whole drive, or multiple partitions with
-	# only the first used
-	usb_drive+=1
+    # loop until the USB is added
+    while [[ "${cur_drives}" == "${new_drives}" ]] ; do
+        echo "Your USB drive wasn't found.  Please insert it now."
+        sleep 5
+        # reload our /dev search results
+        new_drives="$(ls /dev/sd[a-z] | sed 's/\n/ /g')"
+    done
+    
+    # define the last sequential ls entry as the USB drive.
+    usb_drive="$(echo ${new_drives} | awk '{ print $NF }')"
+    
+    # Concatenate 1 to the USB drive entry.  The drive is currently used as if
+    # it had one partition spanning the whole drive, or multiple partitions with
+    # only the first used
+    usb_drive+=1
 
-	# search for if /mnt is already being used as a mount point
-	mnt_search="$(lsblk -a -f | grep mnt || echo x)"
+    # search for if /mnt is already being used as a mount point
+    mnt_search="$(lsblk -a -f | grep mnt || echo x)"
 
-	# search for if the USB was mounted to /media automatically
-	if [[ -n "$(mount | grep "${usb_drive}")" ]] ; then
-		umount "${usb_drive}"
-	fi
+    # search for if the USB was mounted to /media automatically
+    if [[ -n "$(mount | grep "${usb_drive}")" ]] ; then
+        umount "${usb_drive}"
+    fi
 
-	# mount to /mnt or create a new directory, depending on search result	
-	echo -e "\nCopying archive to your USB drive. Don't remove drive until finished."
-	if [[ "${mnt_search}" == "x" ]] ; then
-		# /mnt isn't mounted anywhere
-		# sleep is used to ensure that umount doesn't produce a "target is busy" error
-		mount "${usb_drive}" /mnt
-		mv "${final_tar}" /mnt && sleep 5 && umount /mnt
-	else
-		if [[ ! -e /tmp/mnt ]] ; then
-			mkdir /tmp/mnt
-		fi
-		mount "${usb_drive}" /tmp/mnt
-		mv "${final_tar}" /tmp/mnt && sleep 5 && umount /tmp/mnt
-		rmdir /tmp/mnt
-	fi
+    # mount to /mnt or create a new directory, depending on search result
+    echo -e "\nCopying archive to your USB drive. Don't remove drive until finished."
+    if [[ "${mnt_search}" == "x" ]] ; then
+        # /mnt isn't mounted anywhere
+        # sleep is used to ensure that umount doesn't produce a "target is busy" error
+        mount "${usb_drive}" /mnt
+        mv "${final_tar}" /mnt && sleep 5 && umount /mnt
+    else
+        if [[ ! -e /tmp/mnt ]] ; then
+            mkdir /tmp/mnt
+        fi
+        mount "${usb_drive}" /tmp/mnt
+        mv "${final_tar}" /tmp/mnt && sleep 5 && umount /tmp/mnt
+        rmdir /tmp/mnt
+    fi
 
-	# wrap everything up for those in a TTY
-	echo -e "\nThe archive was copied to your USB drive.  You can now safely remove the drive."
-	
-	echo "Execute this command to shut this TTY session down:  sudo shutdown -h now"
+    # wrap everything up for those in a TTY
+    echo -e "\nThe archive was copied to your USB drive.  You can now safely remove the drive."
+    
+    echo "Execute this command to shut this TTY session down:  sudo shutdown -h now"
 fi
 
 exit 0
