@@ -1,0 +1,15 @@
+Source: alpha-os-troubleshooting-helper
+Section: admin
+Priority: optional
+Maintainer: Richard Buchanan II <richard@alpha.store>
+Build-Depends: debhelper (>= 9)
+Standards-Version: 3.9.8
+Homepage: https://github.com/Alpha-Universal/alpha-system-troubleshooting-helpers
+
+Package: alpha-os-troubleshooting-helper
+Architecture: all
+Depends: ${misc:Depends}
+Description: Collects system and hardware info for Alpha devices.
+ This package includes a script that gathers all system and hardware info
+ for Alpha devices.  This info is gathered via terminal invocation, and
+ can dynamically add extra info based on user input. 

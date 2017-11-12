@@ -1,0 +1,7 @@
+alpha-os-troubleshooting-helper (1.0-1) xenial; urgency=medium
+
+  * Initial release
+  * troubleshooting script now automatically handles mounting and copying to
+  * USB drives for those running in a TTY.
+
+ -- Richard Buchanan II <richard@alpha.store>  Sat, 11 Nov 2017 15:43:41 -0600

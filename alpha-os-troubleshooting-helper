@@ -305,6 +305,7 @@ while [[ "${main_break}" == 0 ]] ; do
                     rm "${dmesg_file}"
                     rm "${info_file}"
                     rm "${bios_file}"
+                    break
                     ;;
                 * )
                     echo -e "\nThat selection is invalid.  Please choose to continue or quit \n"
